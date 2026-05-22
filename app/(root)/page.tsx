@@ -1,54 +1,40 @@
+import { auth } from "@/lib/better-auth/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getMarketIndices } from "@/lib/actions/finnhub.actions";
+import { TICKER_TAPE_WIDGET_CONFIG } from "@/lib/constants";
 import TradingViewWidget from "@/components/TradingViewWidget";
-import {
-    HEATMAP_WIDGET_CONFIG,
-    MARKET_DATA_WIDGET_CONFIG,
-    MARKET_OVERVIEW_WIDGET_CONFIG,
-    TOP_STORIES_WIDGET_CONFIG
-} from "@/lib/constants";
-import {sendDailyNewsSummary} from "@/lib/inngest/functions";
+import DashboardClient from "@/components/DashboardClient";
 
-const Home = () => {
-    const scriptUrl = `https://s3.tradingview.com/external-embedding/embed-widget-`;
+export default async function Home() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  
+  if (!session?.user) {
+    redirect('/sign-in');
+  }
 
-    return (
-        <div className="flex min-h-screen home-wrapper">
-          <section className="grid w-full gap-8 home-section">
-              <div className="md:col-span-1 xl:col-span-1">
-                  <TradingViewWidget
-                    title="Market Overview"
-                    scriptUrl={`${scriptUrl}market-overview.js`}
-                    config={MARKET_OVERVIEW_WIDGET_CONFIG}
-                    className="custom-chart"
-                    height={600}
-                  />
-              </div>
-              <div className="md-col-span xl:col-span-2">
-                  <TradingViewWidget
-                      title="Stock Heatmap"
-                      scriptUrl={`${scriptUrl}stock-heatmap.js`}
-                      config={HEATMAP_WIDGET_CONFIG}
-                      height={600}
-                  />
-              </div>
-          </section>
-            <section className="grid w-full gap-8 home-section">
-                <div className="h-full md:col-span-1 xl:col-span-1">
-                    <TradingViewWidget
-                        scriptUrl={`${scriptUrl}timeline.js`}
-                        config={TOP_STORIES_WIDGET_CONFIG}
-                        height={600}
-                    />
-                </div>
-                <div className="h-full md:col-span-1 xl:col-span-2">
-                    <TradingViewWidget
-                        scriptUrl={`${scriptUrl}market-quotes.js`}
-                        config={MARKET_DATA_WIDGET_CONFIG}
-                        height={600}
-                    />
-                </div>
-            </section>
-        </div>
-    )
+  const user = {
+    id: session.user.id,
+    name: session.user.name,
+    email: session.user.email,
+  };
+
+  // Fetch index data (live or simulated mock values)
+  const indices = await getMarketIndices();
+
+  return (
+    <div className="space-y-6">
+      {/* TradingView Ticker Tape Ribbon */}
+      <div className="w-full relative overflow-hidden bg-gray-900 border border-gray-800 rounded-xl shadow-lg p-0.5">
+        <TradingViewWidget
+          scriptUrl="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js"
+          config={TICKER_TAPE_WIDGET_CONFIG}
+          height={72}
+        />
+      </div>
+
+      {/* Main Glassmorphic Dashboard Body */}
+      <DashboardClient user={user} indices={indices} />
+    </div>
+  );
 }
-
-export default Home;

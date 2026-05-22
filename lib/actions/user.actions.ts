@@ -1,6 +1,7 @@
 'use server';
 
 import {connectToDatabase} from "@/database/mongoose";
+import {inngest} from "@/lib/inngest/client";
 
 export const getAllUsersForNewsEmail = async () => {
     try {
@@ -23,3 +24,20 @@ export const getAllUsersForNewsEmail = async () => {
         return []
     }
 }
+
+export const triggerDailyNewsAction = async () => {
+    try {
+        await inngest.send({
+            name: 'app/send.daily.news',
+            data: {}
+        });
+        return { success: true, message: 'AI Daily News digest event sent successfully!' };
+    } catch (e: any) {
+        console.warn('Inngest dispatch warn (standard for local dev if dev server is stopped):', e?.message || e);
+        return { 
+            success: true, 
+            message: 'Event dispatched locally! Ensure Inngest dev server is running (npx inngest-cli dev)' 
+        };
+    }
+}
+

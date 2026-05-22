@@ -1,7 +1,7 @@
 export const NAV_ITEMS = [
     { href: '/', label: 'Dashboard' },
     { href: '/search', label: 'Search' },
-    // { href: '/watchlist', label: 'Watchlist' },
+    { href: '/watchlist', label: 'Watchlist' },
 ];
 
 // Sign-up form select options
@@ -337,3 +337,22 @@ export const WATCHLIST_TABLE_HEADER = [
     'Alert',
     'Action',
 ];
+
+export const TICKER_TAPE_WIDGET_CONFIG = {
+    symbols: [
+        { proName: "FOREXCOM:SPX2500", title: "S&P 500" },
+        { proName: "FOREXCOM:NSXUSD", title: "Nasdaq 100" },
+        { proName: "FOREXCOM:DJI", title: "Dow Jones" },
+        { proName: "NASDAQ:AAPL", title: "Apple" },
+        { proName: "NASDAQ:MSFT", title: "Microsoft" },
+        { proName: "NASDAQ:NVDA", title: "NVIDIA" },
+        { proName: "NASDAQ:TSLA", title: "Tesla" },
+        { proName: "BITSTAMP:BTCUSD", title: "Bitcoin" }
+    ],
+    showSymbolLogo: true,
+    isTransparent: true,
+    displayMode: "adaptive",
+    colorTheme: "dark",
+    locale: "en"
+};
+
